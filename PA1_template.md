@@ -1,4 +1,9 @@
-# Reproducible Research: Peer Assessment 1
+---
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+  html_document:
+    keep_md: true
+---
 
 
 ## Loading and preprocessing the data
@@ -7,6 +12,20 @@ The data is stored in a zipped CSV file, we'll load it in to the "data" variable
 
 ```r
 library(data.table)
+```
+
+```
+## data.table 1.9.4  For help type: ?data.table
+## *** NB: by=.EACHI is now explicit. See README to restore previous behaviour.
+## 
+## Attaching package: 'data.table'
+## 
+## The following objects are masked from 'package:lubridate':
+## 
+##     hour, mday, month, quarter, wday, week, yday, year
+```
+
+```r
 originaldata <- data.table(read.csv(unz("activity.zip", "activity.csv")))
 ```
 
@@ -34,7 +53,7 @@ Create a histogram out of the total number of steps taken in a day.
 hist(dailySteps$steps, xlab = "Daily Steps", main = "Steps taken in a day")
 ```
 
-![](./PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png) 
 
 Take the results and calculate the mean and median of the "steps" variable.
 
@@ -73,7 +92,7 @@ Create a time series plot.
 plot(x = intervalSteps$interval, y = intervalSteps$steps, type = "l", xlab = "Interval", ylab = "Steps", main = "Daily Activity Pattern")
 ```
 
-![](./PA1_template_files/figure-html/unnamed-chunk-7-1.png) 
+![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png) 
 
 Use the max function to pull out the 5 minute interval that has the highest average number of steps.
 
@@ -122,7 +141,7 @@ Create a histogram out of the total number of steps taken in a day.
 hist(dailySteps$steps, xlab = "Daily Steps", main = "Steps taken in a day")
 ```
 
-![](./PA1_template_files/figure-html/unnamed-chunk-12-1.png) 
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png) 
 
 Take the results and calculate the mean and median of the "steps" variable.
 
@@ -153,18 +172,6 @@ Create a new variable for tracking if the day is a weekday or a weekend.  Us the
 
 ```r
 library(lubridate)
-```
-
-```
-## 
-## Attaching package: 'lubridate'
-## 
-## The following objects are masked from 'package:data.table':
-## 
-##     hour, mday, month, quarter, wday, week, yday, year
-```
-
-```r
 cleanedData$isWeekend <- weekdays(ymd(cleanedData$date)) %in% c("Saturday", "Sunday")
 ```
 
@@ -190,6 +197,6 @@ g <- ggplot(intervalStepsFaceted, aes(interval, steps))
 g + geom_line() + facet_wrap(~ weekendSegment, nrow = 2) + labs(x = "Interval") + labs(y = "Number of steps")
 ```
 
-![](./PA1_template_files/figure-html/unnamed-chunk-16-1.png) 
+![plot of chunk unnamed-chunk-16](figure/unnamed-chunk-16-1.png) 
 
 
