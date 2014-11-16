@@ -1,22 +1,19 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
 The data is stored in a zipped CSV file, we'll load it in to the "data" variable.  We'll then transform the data into a data.table for easier use.
 
-``` {r}
+
+```r
 library(data.table)
 originaldata <- data.table(read.csv(unz("activity.zip", "activity.csv")))
 ```
 
 Exclude all of the rows that have NA for the steps column
 
-``` {r}
+
+```r
 data <- originaldata[!is.na(originaldata$steps), ]
 data <- originaldata
 ```
@@ -25,21 +22,37 @@ data <- originaldata
 
 Transform the data into daily totals by summing up the number of steps by day, using the aggregate function.  
 
-``` {r}
+
+```r
 dailySteps <- aggregate(steps ~ date, data, sum)
 ```
 
 Create a histogram out of the total number of steps taken in a day.
 
-``` {r}
+
+```r
 hist(dailySteps$steps, xlab = "Daily Steps", main = "Steps taken in a day")
 ```
 
+![](./PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
+
 Take the results and calculate the mean and median of the "steps" variable.
 
-``` {r}
+
+```r
 mean(dailySteps$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(dailySteps$steps)
+```
+
+```
+## [1] 10765
 ```
 
 
@@ -47,21 +60,30 @@ median(dailySteps$steps)
 
 Transform the data into average steps taken in each five minute interval, using the mean.
 
-``` {r}
+
+```r
 intervalSteps <- aggregate(steps ~ interval, data, mean)
 ```
 
 
 Create a time series plot.
 
-``` {r}
+
+```r
 plot(x = intervalSteps$interval, y = intervalSteps$steps, type = "l", xlab = "Interval", ylab = "Steps", main = "Daily Activity Pattern")
 ```
 
+![](./PA1_template_files/figure-html/unnamed-chunk-7-1.png) 
+
 Use the max function to pull out the 5 minute interval that has the highest average number of steps.
 
-``` {r}
+
+```r
 intervalSteps$interval[intervalSteps$steps == max(intervalSteps$steps)]
+```
+
+```
+## [1] 835
 ```
 
 
@@ -69,34 +91,56 @@ intervalSteps$interval[intervalSteps$steps == max(intervalSteps$steps)]
 
 Calculate the total number of rows with missing values.
 
-``` {r}
+
+```r
 sum(is.na(originaldata))
+```
+
+```
+## [1] 2304
 ```
 
 Fill in the NA data with the average values
 
-``` {r}
+
+```r
 cleanedData <- originaldata
 cleanedData$steps[is.na(cleanedData$steps)] <- mean(originaldata$steps)
 ```
 
 Pull out the daily steps by summing up the number of steps by day, using the aggregate function.  
 
-``` {r}
+
+```r
 dailySteps <- aggregate(steps ~ date, cleanedData, sum)
 ```
 
 Create a histogram out of the total number of steps taken in a day.
 
-``` {r}
+
+```r
 hist(dailySteps$steps, xlab = "Daily Steps", main = "Steps taken in a day")
 ```
 
+![](./PA1_template_files/figure-html/unnamed-chunk-12-1.png) 
+
 Take the results and calculate the mean and median of the "steps" variable.
 
-``` {r}
+
+```r
 mean(dailySteps$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(dailySteps$steps)
+```
+
+```
+## [1] 10765
 ```
 
 The histogram, mean, and median values did not change at all by imputting the missing values.  This is because the imputted values were calculated by using the mean function.
@@ -106,14 +150,28 @@ The histogram, mean, and median values did not change at all by imputting the mi
 
 Create a new variable for tracking if the day is a weekday or a weekend.  Us the lubridate package to help out.
 
-``` {r}
+
+```r
 library(lubridate)
+```
+
+```
+## 
+## Attaching package: 'lubridate'
+## 
+## The following objects are masked from 'package:data.table':
+## 
+##     hour, mday, month, quarter, wday, week, yday, year
+```
+
+```r
 cleanedData$isWeekend <- weekdays(ymd(cleanedData$date)) %in% c("Saturday", "Sunday")
 ```
 
 Convert the data to intervals.
 
-``` {r}
+
+```r
 intervalStepsWeekday <- aggregate(steps ~ interval, cleanedData[cleanedData$isWeekend == F, ], mean)
 intervalStepsWeekday$weekendSegment = "Weekday"
 intervalStepsWeekend <- aggregate(steps ~ interval, cleanedData[cleanedData$isWeekend == T, ], mean)
@@ -124,12 +182,14 @@ intervalStepsFaceted = rbind(intervalStepsWeekend, intervalStepsWeekday)
 
 Create the plots to compare the data
 
-``` {r}
+
+```r
 library(ggplot2)
 
 g <- ggplot(intervalStepsFaceted, aes(interval, steps))
 g + geom_line() + facet_wrap(~ weekendSegment, nrow = 2) + labs(x = "Interval") + labs(y = "Number of steps")
-
 ```
+
+![](./PA1_template_files/figure-html/unnamed-chunk-16-1.png) 
 
 
